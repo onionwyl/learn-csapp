@@ -1,5 +1,5 @@
 #include "rio.h"
-
+#include<stdio.h>
 
 // size_t是unsigned long ssize_t 是 long
 // read函数在出错时返回-1 所以大小缩小了一半
@@ -59,16 +59,15 @@ static ssize_t rio_read(rio_t *rp, char *usrbuf, size_t n) {
             return 0;
         else
             rp->rio_bufptr = rp->rio_buf;   // 因为重新读入，所以需要重置ptr
-
-        // Copy
-        cnt = n;
-        if(rp->rio_cnt < n)
-            cnt = rp->rio_cnt;
-        memcpy(usrbuf, rp->rio_bufptr, cnt);
-        rp->rio_bufptr += cnt;
-        rp->rio_cnt -= cnt;
-        return cnt;
     }
+    // Copy
+    cnt = n;
+    if(rp->rio_cnt < n)
+        cnt = rp->rio_cnt;
+    memcpy(usrbuf, rp->rio_bufptr, cnt);
+    rp->rio_bufptr += cnt;
+    rp->rio_cnt -= cnt;
+    return cnt;
 }
 ssize_t	rio_readnb(rio_t *rp, void *usrbuf, size_t n) {
     size_t nleft = n;
@@ -88,9 +87,8 @@ ssize_t	rio_readnb(rio_t *rp, void *usrbuf, size_t n) {
 ssize_t	rio_readlineb(rio_t *rp, void *usrbuf, size_t maxlen) {
     int n, rc;
     char c, *bufp = usrbuf;
-
     for(n = 1; n < maxlen; n++) {
-        if((rc == rio_read(rp, &c, 1)) == 1) {
+        if((rc = rio_read(rp, &c, 1)) == 1) {
             *bufp++ = c;
             if(c == '\n') {
                 n++;
