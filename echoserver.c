@@ -5,10 +5,12 @@
 #include<errno.h>
 #include<string.h>
 #include<unistd.h>
+#include "rio.h"
 #define	MAXLINE	 8192  /* Max text line length */
 #define LISTENQ  1024  /* Second argument to listen() */
 
 int open_listenfd(char* port);
+void echo(int connfd);
 
 int main(int argc, char **argv) {
     int listenfd, connfd;
@@ -25,14 +27,15 @@ int main(int argc, char **argv) {
     printf("Listening port %s\n", argv[1]);
     while(1) {
         clientlen = sizeof(struct sockaddr_storage);
-        if((connfd = accept(listenfd, (struct sockaddr *)&clientaddr, &clientlen) < 0)) {
+        if((connfd = accept(listenfd, (struct sockaddr *)&clientaddr, &clientlen)) < 0) {
             fprintf(stderr, "accept error\n");
             exit(1);
         }
         getnameinfo((struct sockaddr *)&clientaddr, clientlen, client_hostname, MAXLINE, client_port, MAXLINE, 0);
         printf("Connected to %s:%s\n", client_hostname, client_port);
         // echo or read something here
-        // echo(connfd);
+        echo(connfd);
+        printf("close\n");
         if (close(connfd) < 0) {
             fprintf(stderr, "close error\n");
             exit(1);
@@ -57,9 +60,8 @@ int open_listenfd(char* port) {
             continue; // socket()错误返回-1
         // 书中描述调用此函数用于使服务器能够被中止、重启、立即开始接受请求。
         setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval, sizeof(int));
-        
         // 将address与socket描述符绑定
-        if (bind(listenfd, p->ai_addr, p->ai_addrlen) == 0)
+        if ((bind(listenfd, p->ai_addr, p->ai_addrlen)) == 0)
             break; // 成功，退出循环
         if (close(listenfd) < 0) { /* Bind failed, try the next */
             fprintf(stderr, "open_listenfd close failed: %s\n", strerror(errno));
@@ -77,4 +79,18 @@ int open_listenfd(char* port) {
         return -1;
     }
     return listenfd;
+}
+
+void echo(int connfd) {
+    size_t n;
+    char buf[MAXLINE];
+    rio_t rio;
+    rio_readinitb(&rio, connfd);
+    // 从connfd中读一行数据并返回ok，直到EOF
+    while((n = rio_readlineb(&rio, buf, MAXLINE)) != 0) {
+        printf("Server received %d bytes\n", (int)n);
+        printf("Message: %s", buf);
+        char msg[] = "ok\n";
+        rio_writen(connfd, msg, strlen(msg));
+    }
 }
