@@ -1,10 +1,14 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<sys/socket.h>
+#include<sys/stat.h>
+#include<sys/mman.h>
+#include<sys/wait.h>
 #include<netdb.h>
 #include<errno.h>
 #include<string.h>
 #include<unistd.h>
+#include<fcntl.h>
 #include "rio.h"
 
 #define	MAXLINE	 8192  /* Max text line length */
@@ -12,3 +16,11 @@
 
 int open_listenfd(char* port);
 void handle(int fd);
+void read_request_headers(rio_t *rp);
+int parse_uri(char *uri, char *filename, char *cgiargs);
+void serve_static(int fd, char *filename, int filesize);
+void get_filetype(char *filename, char *filetype);
+void serve_dynamic(int fd, char *filename, char *cgiargs);
+void clienterror(int fd, char *cause, char *errnum, char *shortmsg, char *longmsg);
+
+extern char **environ; /* Defined by libc */
