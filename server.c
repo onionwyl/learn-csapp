@@ -159,7 +159,6 @@ void get_filetype(char *filename, char *filetype) {
 
 void serve_dynamic(int fd, char *filename, char *cgiargs) {
     char buf[MAXLINE], *emptylist[] = {NULL};
-
     sprintf(buf, "HTTP/1.0 200 OK\r\n"); 
     rio_writen(fd, buf, strlen(buf));
     sprintf(buf, "Server: Tiny Web Server\r\n");
@@ -167,7 +166,10 @@ void serve_dynamic(int fd, char *filename, char *cgiargs) {
     if(fork() == 0) {
         printf("Query %s\n", cgiargs);
         setenv("QUERY_STRING", cgiargs, 1);
-        dup2(fd, STDOUT_FILENO);
+        if(dup2(fd, STDOUT_FILENO) < 0) {
+            fprintf(stderr, "dup2 error\n");
+            exit(1);
+        }
         // 运行cgi程序
         execve(filename, emptylist, environ);
     }
@@ -190,4 +192,18 @@ void clienterror(int fd, char *cause, char *errnum, char *shortmsg, char *longms
     sprintf(buf, "Content-length: %d\r\n\r\n", (int)strlen(body));
     rio_writen(fd, buf, strlen(buf));
     rio_writen(fd, body, strlen(body));
+}
+
+void echo(int connfd) {
+    size_t n;
+    char buf[MAXLINE];
+    rio_t rio;
+    rio_readinitb(&rio, connfd);
+    // 从connfd中读一行数据并返回ok，直到EOF
+    while((n = rio_readlineb(&rio, buf, MAXLINE)) != 0) {
+        printf("Server received %d bytes\n", (int)n);
+        printf("Message: %s", buf);
+        char msg[] = "ok\n";
+        rio_writen(connfd, msg, strlen(msg));
+    }
 }
