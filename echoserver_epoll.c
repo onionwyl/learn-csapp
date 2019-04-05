@@ -38,13 +38,18 @@ int main(int argc, char **argv) {
                 connfd = accept(listenfd, (struct sockaddr*)&clientaddr, &clientlen);
                 getnameinfo((struct sockaddr *)&clientaddr, clientlen, client_hostname, MAXLINE, client_port, MAXLINE, 0);
                 printf("Connected to %s:%s\n", client_hostname, client_port);
-                // event.events = EPOLLIN;
-                // event.data.fd == connfd;
-                // // 添加accept描述符，等待client发送数据
-                // epoll_ctl(epfd, EPOLL_CTL_ADD, connfd, &event);
-                echo(connfd);
-                close(connfd);
-                
+                // int flags;
+                // if ((flags = fcntl(connfd, F_GETFL, NULL)) < 0) {
+                //     return -1;
+                // }
+                // if (fcntl(connfd, F_SETFL, flags | O_NONBLOCK) == -1) {
+                //     return -1;
+                // }
+                //event.events = EPOLLIN|EPOLLET;
+                event.events = EPOLLIN;
+                event.data.fd = connfd;
+                // 添加accept描述符，等待client发送数据
+                epoll_ctl(epfd, EPOLL_CTL_ADD, connfd, &event);  
             } else {
                 echo(ep_events[i].data.fd);
                 close(ep_events[i].data.fd);
