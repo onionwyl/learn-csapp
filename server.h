@@ -12,12 +12,13 @@
 #include<string.h>
 #include<unistd.h>
 #include<fcntl.h>
-#include "rio.h"
+#include"rio.h"
 
 #define	MAXLINE	 8192  /* Max text line length */
 #define LISTENQ  1024  /* Second argument to listen() */
 
 int open_listenfd(char* port);
+int accept_connection(int listenfd);
 void handle(int fd);
 void read_request_headers(rio_t *rp);
 int parse_uri(char *uri, char *filename, char *cgiargs);

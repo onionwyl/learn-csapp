@@ -37,6 +37,17 @@ int open_listenfd(char* port) {
     return listenfd;
 }
 
+int accept_connection(int listenfd) {
+    int connfd;
+    socklen_t clientlen;
+    struct sockaddr_storage clientaddr;
+    char client_hostname[MAXLINE], client_port[MAXLINE];
+    connfd = accept(listenfd, (struct sockaddr*)&clientaddr, &clientlen);
+    getnameinfo((struct sockaddr *)&clientaddr, clientlen, client_hostname, MAXLINE, client_port, MAXLINE, 0);
+    printf("Connected to %s:%s\n", client_hostname, client_port);
+    return connfd;
+}
+
 void handle(int fd) {
     int is_static;
     struct stat sbuf;
