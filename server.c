@@ -45,7 +45,8 @@ void handle(int fd) {
     rio_t rio;
 
     rio_readinitb(&rio, fd);
-    rio_readlineb(&rio, buf, MAXLINE);
+    if(!rio_readlineb(&rio, buf, MAXLINE)) 
+        return;
     printf("Request headers:\n");
     printf("%s", buf);
     sscanf(buf, "%s %s %s", method, uri, version);
