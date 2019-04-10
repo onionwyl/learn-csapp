@@ -6,7 +6,7 @@ int main(void) {
     int n1=0, n2=0;
 
     /* Extract the two arguments */
-    if((buf = getenv("QUERY_STRING")) != NULL) {
+    if((buf = getenv("QUERY_STRING")) != NULL && strlen(buf) != 0) {
         p = strchr(buf, '&');   // 找到第一次出现&的未知
         *p = '\0';
         strcpy(arg1, buf);  // 读取两个参数

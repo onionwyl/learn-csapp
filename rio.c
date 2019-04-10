@@ -29,7 +29,7 @@ ssize_t rio_writen(int fd, void *usrbuf, size_t n) {
         // write出错为-1，不过这里如果是0还不太明白，也许是写不进去了？
         if((nwritten = write(fd, bufp, nleft)) <= 0) {
             if(errno == EINTR)  // 中断
-                nwritten == 0;
+                nwritten = 0;
             else
                 return -1;
         }
