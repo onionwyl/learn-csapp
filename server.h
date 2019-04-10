@@ -1,3 +1,6 @@
+#ifndef __SERVER_H__ 
+#define __SERVER_H__
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<sys/socket.h>
@@ -23,5 +26,9 @@ void get_filetype(char *filename, char *filetype);
 void serve_dynamic(int fd, char *filename, char *cgiargs);
 void clienterror(int fd, char *cause, char *errnum, char *shortmsg, char *longmsg);
 void echo(int connfd);
+int make_socket_non_blocking(int fd);
+void unix_error(char *msg);
 
 extern char **environ; /* Defined by libc */
+
+#endif

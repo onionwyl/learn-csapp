@@ -208,3 +208,19 @@ void echo(int connfd) {
         rio_writen(connfd, msg, strlen(msg));
     }
 }
+
+int make_socket_non_blocking(int fd) {
+    int flag = fcntl(fd, F_GETFL, 0);
+    if(flag == -1)
+        return -1;
+
+    flag |= O_NONBLOCK;
+    if(fcntl(fd, F_SETFL, flag) == -1)
+        return -1;
+}
+
+void unix_error(char *msg) /* Unix-style error */
+{
+    fprintf(stderr, "%s: %s\n", msg, strerror(errno));
+    exit(0);
+}

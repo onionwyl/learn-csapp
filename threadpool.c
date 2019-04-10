@@ -47,7 +47,7 @@ threadpool_t *threadpool_create(int min_thread_num, int max_thread_num, int queu
                 threadpool_destroy(pool);
                 return NULL;
             }
-            printf("Start thread 0x%x\n", (unsigned int)pool->threads[i]);
+            //printf("Start thread 0x%x\n", (unsigned int)pool->threads[i]);
         }
         // 启动线程池管理线程
         if(pthread_create(&(pool->admin_thread), NULL, admin_thread, (void *)pool) != 0) {
@@ -82,7 +82,7 @@ static void *threadpool_thread(void *arg){
         }
         if(pool->shutdown) {
             pthread_mutex_unlock(&(pool->lock));
-            printf("Thread 0x%x exit\n", (unsigned int)pthread_self());
+            //printf("Thread 0x%x exit\n", (unsigned int)pthread_self());
             pthread_exit(NULL);
         }
         // 从任务队列中取出一个任务
@@ -96,7 +96,7 @@ static void *threadpool_thread(void *arg){
         // 解锁pool
         pthread_mutex_unlock(&(pool->lock));
         // 执行任务
-        printf("thread 0x%x start working \n", (unsigned int)pthread_self());
+        //printf("thread 0x%x start working \n", (unsigned int)pthread_self());
         // 记录正在运行的thread
         pthread_mutex_lock(&(pool->thread_counter));
         pool->busy_thread_num++;
@@ -104,7 +104,7 @@ static void *threadpool_thread(void *arg){
         // 调用任务函数
         (*(task.function))(task.arg);
         // 任务执行完毕
-        printf("thread 0x%x end working \n", (unsigned int)pthread_self());
+        //printf("thread 0x%x end working \n", (unsigned int)pthread_self());
         pthread_mutex_lock(&(pool->thread_counter));
         pool->busy_thread_num--;
         pthread_mutex_unlock(&(pool->thread_counter));
@@ -172,7 +172,7 @@ int threadpool_destroy(threadpool_t *pool){
     pthread_cond_broadcast(&(pool->queue_not_empty));
     for(int i = 0; i < pool->min_thread_num; i++)
         if(pthread_join(pool->threads[i], NULL) != 0)
-            printf("thread %d end failed", i);
+            fprintf(stderr, "thread %d end failed", i);
     threadpool_free(pool);
     
     return 0;

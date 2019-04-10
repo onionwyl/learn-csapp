@@ -1,3 +1,6 @@
+#ifndef __THREADPOOL_H__
+#define __THREADPOOL_H__
+
 #include<pthread.h>
 #include<stdlib.h>
 #include<stdio.h>
@@ -35,3 +38,5 @@ typedef struct threadpool {
 threadpool_t *threadpool_create(int min_thread_num, int max_thread_num, int queue_max_size);
 int threadpool_add_task(threadpool_t *pool, void *(*function)(void *), void *arg);
 int threadpool_destroy(threadpool_t *pool); // 关闭线程池
+
+#endif

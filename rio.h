@@ -1,3 +1,6 @@
+#ifndef __RIO_H__
+#define __RIO_H__
+
 #include<unistd.h>
 #include<errno.h>
 #include<string.h>
@@ -21,3 +24,5 @@ void rio_readinitb(rio_t *rp, int fd);
 // RIO 带缓冲的输入输出函数
 ssize_t	rio_readnb(rio_t *rp, void *usrbuf, size_t n);
 ssize_t	rio_readlineb(rio_t *rp, void *usrbuf, size_t maxlen);
+
+#endif
