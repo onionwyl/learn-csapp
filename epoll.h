@@ -3,7 +3,8 @@
 
 #include<sys/epoll.h>
 #include"threadpool.h"
-#include"server.h"
+#include"utils.h"
+#include"http.h"
 
 #define MAXEVENTS 1024
 struct epoll_event *ep_events;
